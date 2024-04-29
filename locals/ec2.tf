@@ -1,14 +1,38 @@
-resource "aws_instance" "my_instance" {
-  count=length(var.instance_name)
+resource "aws_instance" "web" {
   ami           = var.ami_id
-  # instance_type = "t2.micro"
-  instance_type = local.instance_type
-  vpc_security_group_ids = [aws_security_group.sg_practice.id]
+  instance_type = local.instance_name
+  vpc_security_group_ids = [aws_security_group.practicetf.id]
+
   tags = {
-  Name = var.instance_name[count.index]
-  Project= var.project_name
-  Component= var.Component_name
-  Environment= var.env_name
-  Terraform = var.terraform_help
+    Name = "web-server"
   }
 }
+
+resource "aws_security_group" "practicetf" {
+  name        = "practice_sg"
+  description = "Allow TLS inbound traffic and all outbound traffic"
+  # vpc_id      = aws_vpc.main.id
+
+  tags = {
+    Name = "practice_sg"
+  }
+
+  ingress {
+    description = "Allow all ports"
+    from_port        = 0
+    to_port          = 0
+    protocol         = "all"
+    cidr_blocks      = var.cidr_blocks
+    # ipv6_cidr_blocks = ["::/0"]
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = var.cidr_blocks
+    # ipv6_cidr_blocks = ["::/0"]
+  }
+}
+
+
